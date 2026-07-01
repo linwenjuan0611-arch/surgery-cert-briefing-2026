@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>外科学系临床专业认证工作部署会</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --stage-bg: #eef1f5;
+      --slide-bg: #fbfcfe;
+      --paper: #fbfcfe;
+      --paper-2: #f3f6fa;
+      --ink: #1f2be0;
+      --ink-soft: #5560e5;
+      --text: #17203b;
+      --text-soft: #4e5877;
+      --line: rgba(31, 43, 224, 0.10);
+      --line-strong: rgba(31, 43, 224, 0.28);
+      --chip: rgba(255,255,255,0.82);
+      --shadow: 0 18px 42px rgba(31, 43, 224, 0.06);
+      --font-display: "Newsreader", serif;
+      --font-body: "Hanken Grotesk", sans-serif;
+      --font-mono: "DM Mono", monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--stage-bg);
+      font-family: var(--font-body);
+      color: var(--text);
+    }
+
+    .deck-viewport {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: var(--stage-bg);
+    }
+
+    .deck-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: 0 0;
+      background: var(--slide-bg);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, var(--paper), var(--paper-2));
+      overflow: hidden;
+    }
+
+    .slide.active,
+    .slide.visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    .slide::before,
+    .slide::after {
+      content: "";
+      position: absolute;
+      left: 72px;
+      right: 72px;
+      height: 2px;
+      background: var(--ink);
+      z-index: 2;
+    }
+
+    .slide::before { top: 72px; }
+    .slide::after { bottom: 72px; }
+
+    .slide-header,
+    .slide-footer {
+      position: absolute;
+      left: 96px;
+      right: 96px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 4;
+    }
+
+    .slide-header {
+      top: 96px;
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 22px;
+      letter-spacing: .08em;
+    }
+
+    .slide-footer {
+      bottom: 96px;
+      color: var(--text-soft);
+      font-size: 19px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+    }
+
+    .brand img {
+      width: 212px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .page-no {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      color: var(--ink);
+    }
+
+    .content {
+      position: absolute;
+      inset: 176px 120px 140px 120px;
+      z-index: 3;
+    }
+
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: 23px;
+      color: var(--ink-soft);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      font-family: var(--font-display);
+      color: var(--ink);
+      font-size: 84px;
+      line-height: 1.04;
+      letter-spacing: -.03em;
+    }
+
+    .title.medium { font-size: 72px; }
+    .title.small { font-size: 62px; }
+
+    .lede {
+      margin-top: 22px;
+      font-size: 30px;
+      line-height: 1.68;
+      color: var(--text);
+    }
+
+    .lede.tight {
+      font-size: 27px;
+      line-height: 1.6;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .cards {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--chip);
+      border-radius: 26px;
+      padding: 26px 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      color: var(--ink);
+      font-size: 28px;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .card p, .card li {
+      color: var(--text);
+      font-size: 23px;
+      line-height: 1.58;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 34px;
+    }
+
+    .stat {
+      padding: 24px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.46);
+    }
+
+    .stat strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 54px;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 10px;
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-soft);
+    }
+
+    .bullet-list {
+      margin-top: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .bullet-item {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 18px;
+      font-size: 24px;
+      line-height: 1.58;
+      color: var(--text);
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--ink);
+      margin-top: 12px;
+    }
+
+    .split-note {
+      margin-top: 26px;
+      padding: 22px 24px;
+      border-left: 6px solid var(--ink);
+      background: rgba(255,255,255,.44);
+      border-radius: 0 18px 18px 0;
+      font-size: 24px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .table {
+      margin-top: 28px;
+      border-top: 1.5px solid var(--line-strong);
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 220px 240px 1fr;
+      gap: 18px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 22px;
+      line-height: 1.5;
+    }
+
+    .table-row.head {
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 21px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .table-row span:first-child {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .matrix {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .cell {
+      min-height: 176px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px 24px;
+      background: rgba(255,255,255,.42);
+    }
+
+    .cell h4 {
+      color: var(--ink);
+      font-size: 25px;
+      margin-bottom: 10px;
+    }
+
+    .cell ul {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+      font-size: 22px;
+      line-height: 1.52;
+      color: var(--text);
+    }
+
+    .agenda {
+      margin-top: 26px;
+      border-top: 1.5px solid var(--line-strong);
+    }
+
+    .agenda-row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 24px;
+      line-height: 1.52;
+      color: var(--text);
+    }
+
+    .agenda-row b {
+      font-family: var(--font-mono);
+      color: var(--ink);
+    }
+
+    .link-list {
+      margin-top: 30px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .link-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,.78);
+      padding: 24px 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .link-card h4 {
+      color: var(--ink);
+      font-size: 28px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .link-card a {
+      color: #1737d8;
+      font-size: 22px;
+      line-height: 1.55;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+
+    .cover {
+      background:
+        radial-gradient(circle at 82% 16%, rgba(85,96,229,.09), transparent 20%),
+        radial-gradient(circle at 12% 82%, rgba(31,43,224,.06), transparent 24%),
+        linear-gradient(180deg, #fcfdff, #f1f5fb);
+    }
+
+    .cover .content {
+      inset: 172px 120px 150px 120px;
+      display: block;
+    }
+
+    .cover .title {
+      font-size: 92px;
+      width: 1280px;
+      white-space: nowrap;
+    }
+
+    .cover .lede {
+      width: 920px;
+    }
+
+    .cover .content > div:first-child {
+      width: 1280px;
+    }
+
+    .cover-panel {
+      position: absolute;
+      left: 0;
+      bottom: 12px;
+      width: 640px;
+      padding: 32px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.58);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .meta {
+      display: grid;
+      gap: 16px;
+    }
+
+    .meta div {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 14px;
+      font-size: 24px;
+      line-height: 1.5;
+    }
+
+    .meta label {
+      color: var(--text-soft);
+      font-weight: 700;
+    }
+
+    .has-reference .content {
+      inset: 176px 700px 140px 120px;
+    }
+
+    .reference-image {
+      position: absolute;
+      right: 128px;
+      bottom: 146px;
+      width: 520px;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(24,36,82,.16);
+      border: 1px solid rgba(31,43,224,.08);
+      z-index: 3;
+    }
+
+    .has-archive-image .content {
+      inset: 176px 620px 140px 120px;
+    }
+
+    .archive-image {
+      position: absolute;
+      right: 118px;
+      bottom: 136px;
+      width: 430px;
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(24,36,82,.12);
+      border: 1px solid rgba(31,43,224,.08);
+      z-index: 3;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .72s var(--ease), transform .72s var(--ease);
+    }
+
+    .visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .delay-1 { transition-delay: .10s; }
+    .delay-2 { transition-delay: .18s; }
+    .delay-3 { transition-delay: .26s; }
+    .delay-4 { transition-delay: .34s; }
+
+    .deck-controls {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(10,16,36,.86);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+
+    .control-btn {
+      border: none;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font: inherit;
+    }
+
+    .control-btn:hover {
+      background: rgba(255,255,255,.12);
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-viewport">
+    <main class="deck-stage" id="deckStage">
+
+      <section class="slide cover active">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">01</div>
+        </div>
+        <div class="content">
+          <div>
+            <div class="kicker reveal delay-1">临床专业认证工作部署会</div>
+            <h1 class="title reveal delay-2">外科学系临床专业认证工作部署会</h1>
+            <p class="lede reveal delay-3">
+              围绕新版认证要求，结合学校与学院最新通知，
+              统一专科教研室迎评口径，明确医协云平台教学活动完善要求、
+              课程运行管理责任和近期整改节点。
+            </p>
+          </div>
+          <aside class="cover-panel reveal delay-4">
+            <div class="meta">
+              <div><label>汇报人</label><span>外科学系</span></div>
+              <div><label>参会人员</label><span>外科学系及专科教研室正副主任、教学秘书</span></div>
+              <div><label>时间</label><span>2026年7月1日</span></div>
+              <div><label>主题</label><span>迎评部署、平台补齐、责任压实</span></div>
+            </div>
+          </aside>
+        </div>
+        <div class="slide-footer">
+          <span>第一临床医学院 · 外科学系</span>
+          <span>以评促建 以评促改 以评促强</span>
+        </div>
+      </section>
+
+      <section class="slide has-reference">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">02</div>
+        </div>
+        <div class="content">
+          <div class="kicker reveal delay-1">临床专业认证基本情况</div>
+          <h2 class="title medium reveal delay-2">我们不能再按“上一轮经验”照搬准备</h2>
+          <div class="stats reveal delay-3">
+            <div class="stat">
+              <strong>2019</strong>
+              <span>学校官网显示：广东医科大学临床医学于2019年通过教育部临床医学专业认证，有效期6年。</span>
+            </div>
+            <div class="stat">
+              <strong>2022</strong>
+              <span>现行认证依据已调整为《中国本科医学教育标准——临床医学专业（2022版）》。 </span>
+            </div>
+            <div class="stat">
+              <strong>2025</strong>
+              <span>现行工作口径执行《本科临床医学专业认证指南（2025版）》。 </span>
+            </div>
+          </div>
+          <div class="bullet-list reveal delay-4">
+            <div class="bullet-item"><span class="dot"></span><span>新版流程由“数据监测、认证申请、学校自评、现场考察、认证报告、认证结论、持续改进”七个环节构成。</span></div>
+            <div class="bullet-item"><span class="dot"></span><span>新增前期考察与现场考察基本指标，更强调先看底线条件、再进现场考察。</span></div>
+            <div class="bullet-item"><span class="dot"></span><span>认证结论已简化为“通过认证”或“不予认证”，通过认证有效期一般为6年。</span></div>
+            <div class="bullet-item"><span class="dot"></span><span>认证有效期内增加重大变化报告、进展报告、综合报告以及绿牌/黄牌/红牌动态监测。</span></div>
+          </div>
+        </div>
+        <img class="reference-image reveal delay-4" src="./.frontend-slides/assets/认证标准指南.jpg" alt="中国本科医学教育标准与本科临床医学专业认证指南">
+        <div class="slide-footer">
+          <span>临床专业认证</span>
+          <span>2 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">03</div>
+        </div>
+        <div class="content two-col">
+          <div>
+            <div class="kicker reveal delay-1">本次部署重点</div>
+            <h2 class="title medium reveal delay-2">专科教研室当前最需要抓住的一件事</h2>
+            <p class="lede tight reveal delay-3">
+              目前专科教研室层面，重点是把医协云平台中的实习教学活动按要求补齐、补实、补到位，
+              让平台记录能够与实习生教学档案相互印证。
+            </p>
+            <div class="split-note reveal delay-4">
+              各专科教研室已开展的每一项实习教学活动，都要按档案目录和规定频次在医协云平台规范留痕。
+            </div>
+          </div>
+          <div class="cards reveal delay-4">
+            <div class="card">
+              <h3>对专科教研室</h3>
+              <p>聚焦实习教学活动是否达到频次、是否及时录入、是否与纸质档案一致。</p>
+            </div>
+            <div class="card">
+              <h3>对外科学系</h3>
+              <p>聚焦课程运行管理、口径统一、问题汇总、进度督办和教学档案统筹。</p>
+            </div>
+            <div class="card">
+              <h3>对临床科室</h3>
+              <p>聚焦实习档案真实完整、平台留痕及时、出科材料闭环。</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>课程运行与实习带教</span>
+          <span>3 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide has-archive-image">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">04</div>
+        </div>
+        <div class="content">
+          <div class="kicker reveal delay-1">按《实习档案目录》要求完善医协云平台教学活动</div>
+          <h2 class="title small reveal delay-2">请各教研室对照下面频次逐项补齐</h2>
+          <div class="table reveal delay-3">
+            <div class="table-row head">
+              <span>教学活动</span>
+              <span>频次要求</span>
+              <span>平台留痕要求</span>
+            </div>
+            <div class="table-row">
+              <span>入院（科）教育与技能培训</span>
+              <span>每轮转须开展</span>
+              <span>有计划、有记录，在医协云规范存档。</span>
+            </div>
+            <div class="table-row">
+              <span>实习科室小讲课</span>
+              <span>每周1次</span>
+              <span>上传课件、会议记录、现场照片。</span>
+            </div>
+            <div class="table-row">
+              <span>教学查房</span>
+              <span>每两周1次</span>
+              <span>由主治医师及以上承担，有记录、有反馈。</span>
+            </div>
+            <div class="table-row">
+              <span>教学病历讨论</span>
+              <span>平均每两周1次</span>
+              <span>有学生汇报参与，有课件、记录、照片、反馈。</span>
+            </div>
+            <div class="table-row">
+              <span>住院病历指导和修改</span>
+              <span>每位学生至少2份大病历</span>
+              <span>需有带教老师修改痕迹，纸质保存并拍照上传。</span>
+            </div>
+            <div class="table-row">
+              <span>出科考试与师生互评</span>
+              <span>每次出科均完成</span>
+              <span>理论/技能考试、教师评学生、学生评教师均须留痕。</span>
+            </div>
+          </div>
+        </div>
+        <img class="archive-image reveal delay-4" src="./.frontend-slides/assets/实习档案目录附图.png" alt="实习档案目录附图">
+        <div class="slide-footer">
+          <span>注意：以上档案材料均需在医协云平台规范存档。学生的大病历纸质保存，并拍照上传至平台。</span>
+          <span>4 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">05</div>
+        </div>
+        <div class="content">
+          <div class="kicker reveal delay-1">把职责边界讲清，后面整改才不会反复扯皮</div>
+          <h2 class="title medium reveal delay-2">外科学系管课程与教学档案，科室管实习档案</h2>
+          <div class="matrix reveal delay-3">
+            <div class="cell">
+              <h4>外科学系</h4>
+              <ul>
+                <li>统筹《外科学》《外科学总论》课程运行管理</li>
+                <li>统筹教研室教学档案集中存档</li>
+                <li>统一口径、汇总问题、督办整改</li>
+                <li>推进试讲、集体备课、课件教案规范化</li>
+              </ul>
+            </div>
+            <div class="cell">
+              <h4>专科教研室</h4>
+              <ul>
+                <li>落实课程带教、见习教学和相关教师准备</li>
+                <li>配合完善课程材料与教学记录</li>
+                <li>按要求检查医协云平台教学活动完整性</li>
+                <li>对本教研室问题建立整改台账</li>
+              </ul>
+            </div>
+            <div class="cell">
+              <h4>临床科室</h4>
+              <ul>
+                <li>负责实习生档案纸质材料留存</li>
+                <li>负责实习教学活动真实开展与留痕</li>
+                <li>负责大病历、出科考试、师生互评等材料闭环</li>
+              </ul>
+            </div>
+            <div class="cell">
+              <h4>教研室主任 / 副主任 / 教学秘书</h4>
+              <ul>
+                <li>主任：第一责任人，亲自部署督办</li>
+                <li>副主任：抓课程、抓审核、抓落实</li>
+                <li>教学秘书：抓台账、抓收集、抓对接</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>职责分工</span>
+          <span>5 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">06</div>
+        </div>
+        <div class="content two-col">
+          <div>
+            <div class="kicker reveal delay-1">根据现有摸排情况，问题并不分散</div>
+            <h2 class="title medium reveal delay-2">当前主要短板很集中，整改也要集中发力</h2>
+            <div class="agenda reveal delay-3">
+              <div class="agenda-row"><b>01</b><span>实习带教一直在做，但实习档案不完善。</span></div>
+              <div class="agenda-row"><b>02</b><span>医协云平台教学活动填写不及时，已开展活动存在补录滞后。</span></div>
+              <div class="agenda-row"><b>03</b><span>大部分课件教案已更新，但个别教师仍需继续完善。</span></div>
+              <div class="agenda-row"><b>04</b><span>迎评期间授课教师仍要完成试讲和集体备课全覆盖。</span></div>
+            </div>
+          </div>
+          <div class="cards reveal delay-4">
+            <div class="card">
+              <h3>这周先做什么</h3>
+              <p>逐教研室核对医协云平台活动缺口，按频次要求列出补录清单，责任到人、责任到时间。</p>
+            </div>
+            <div class="card">
+              <h3>同时抓什么</h3>
+              <p>把纸质档案、现场活动、医协云平台三条证据链逐步对齐，避免“做了但说不清、查不到、对不上”。</p>
+            </div>
+            <div class="card">
+              <h3>会议上怎么强调</h3>
+              <p>凡是平台缺项、频次不达标、记录不闭环的，都要视为迎评风险点，不能留到临近入校再补。</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>近期重点工作</span>
+          <span>6 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">07</div>
+        </div>
+        <div class="content two-col">
+          <div>
+            <div class="kicker reveal delay-1">教师课堂准备</div>
+            <h2 class="title medium reveal delay-2">围绕迎评周教学活动，先把教师准备工作做扎实</h2>
+            <p class="lede tight reveal delay-3">
+              各教研室须围绕9月20日至9月24日期间的理论、见习、实验及实习教学活动，
+              提前锁定教师、统一标准、优化课堂设计，确保课堂展示状态和教学质量达到专业认证要求。
+            </p>
+          </div>
+          <div class="cards reveal delay-4">
+            <div class="card">
+              <h3>1. 严格遴选授课教师</h3>
+              <p>各教研室须严格遴选9月20日至9月24日期间的授课教师，包括理论、见习、实验及实习教学活动教师。所有任课教师均须按规定完成试讲、集体备课，确保授课能力符合专业认证标准。</p>
+            </div>
+            <div class="card">
+              <h3>2. 全面更新课件与教案</h3>
+              <p>严禁沿用往年老旧教案课件。所有授课材料须根据统一课件模板和教案模板更新，充分体现教学内容更新和教学持续改进成效。</p>
+            </div>
+            <div class="card">
+              <h3>3. 优化课堂教学设计</h3>
+              <p>各教研室须组织教师优化课堂教学设计，丰富课堂互动环节，充分调动学生课堂参与度，杜绝单向“满堂灌”式授课，切实提升课堂教学成效。</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>授课教师课堂准备</span>
+          <span>7 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">08</div>
+        </div>
+        <div class="content">
+          <div class="kicker reveal delay-1">教学进度表链接</div>
+          <h2 class="title medium reveal delay-2">授课与见习安排以后续最终课表为准，现阶段统一查看以下进度表</h2>
+          <div class="link-list reveal delay-3">
+            <div class="link-card">
+              <h4>2026-2027学年第一学期外科学系理论进度表</h4>
+              <a href="https://365.kdocs.cn/l/cu7iHqZhKrc9" target="_blank">https://365.kdocs.cn/l/cu7iHqZhKrc9</a>
+            </div>
+            <div class="link-card">
+              <h4>2026-2027学年第一期外科见习进度表附院</h4>
+              <a href="https://365.kdocs.cn/l/cvKkJnZVTRC7" target="_blank">https://365.kdocs.cn/l/cvKkJnZVTRC7</a>
+            </div>
+            <div class="link-card">
+              <h4>2026-2027学年第一学期外科学总论实验进度表</h4>
+              <a href="https://365.kdocs.cn/l/coUzCxiRh22r" target="_blank">https://365.kdocs.cn/l/coUzCxiRh22r</a>
+            </div>
+            <div class="link-card">
+              <h4>2026-2027学年第一学期外科学总论实验进度表（第五个班）</h4>
+              <a href="https://365.kdocs.cn/l/ckdXyEzOShHv" target="_blank">https://365.kdocs.cn/l/ckdXyEzOShHv</a>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>课程与见习进度表</span>
+          <span>8 / 9</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-header">
+          <div class="brand">
+            <img src="./校徽.png" alt="广东医科大学校徽与校名">
+          </div>
+          <div class="page-no">09</div>
+        </div>
+        <div class="content">
+          <div class="kicker reveal delay-1">用时间节点倒逼落实</div>
+          <h2 class="title medium reveal delay-2">接下来外科学系和各教研室要盯住三个时间点</h2>
+          <div class="table reveal delay-3">
+            <div class="table-row head">
+              <span>时间点</span>
+              <span>工作重点</span>
+              <span>工作要求</span>
+            </div>
+            <div class="table-row">
+              <span>即日起</span>
+              <span>全面自查医协云平台与实习档案缺口</span>
+              <span>按频次逐项补录，建立问题清单和整改台账。</span>
+            </div>
+            <div class="table-row">
+              <span>2026年7月20日</span>
+              <span>外科学系档案迎检</span>
+              <span>系层面材料、教学档案和问题台账要能随时调阅。</span>
+            </div>
+            <div class="table-row">
+              <span>2026年9月20日-24日</span>
+              <span>专家组入校现场考察</span>
+              <span>教师准备、课程运行、实习带教与平台证据链都要经得起抽查。</span>
+            </div>
+          </div>
+          <div class="split-note reveal delay-4">
+            请各教研室会后尽快完成两件事：一是把医协云平台教学活动按规定频次补齐；
+            二是把问题台账和整改进度主动反馈到外科学系，确保后续检查时情况清、证据全、能解释、可追踪。
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>第一临床医学院 · 外科学系</span>
+          <span>谢谢</span>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="deck-controls" aria-label="Presentation controls">
+    <button class="control-btn" id="prevBtn" title="Previous slide">Prev</button>
+    <span id="slideCounter">1 / 9</span>
+    <button class="control-btn" id="nextBtn" title="Next slide">Next</button>
+  </div>
+
+  <script>
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.counter = document.getElementById('slideCounter');
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupButtons();
+        this.showSlide(0);
+      }
+
+      setupStageScale() {
+        const scale = () => {
+          const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+          const x = (window.innerWidth - 1920 * factor) / 2;
+          const y = (window.innerHeight - 1080 * factor) / 2;
+          this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+      }
+
+      setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+          if (['ArrowRight', 'PageDown', ' '].includes(e.key)) this.next();
+          if (['ArrowLeft', 'PageUp'].includes(e.key)) this.prev();
+        });
+      }
+
+      setupTouchNav() {
+        document.addEventListener('touchstart', (e) => {
+          this.touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        document.addEventListener('touchend', (e) => {
+          this.touchEndX = e.changedTouches[0].screenX;
+          const delta = this.touchEndX - this.touchStartX;
+          if (Math.abs(delta) < 40) return;
+          if (delta < 0) this.next();
+          if (delta > 0) this.prev();
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        let busy = false;
+        document.addEventListener('wheel', (e) => {
+          if (busy) return;
+          busy = true;
+          if (e.deltaY > 0) this.next();
+          if (e.deltaY < 0) this.prev();
+          setTimeout(() => { busy = false; }, 420);
+        }, { passive: true });
+      }
+
+      setupButtons() {
+        document.getElementById('prevBtn').addEventListener('click', () => this.prev());
+        document.getElementById('nextBtn').addEventListener('click', () => this.next());
+      }
+
+      showSlide(index) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === this.currentSlide);
+          slide.classList.toggle('visible', i === this.currentSlide);
+        });
+        this.counter.textContent = `${this.currentSlide + 1} / ${this.slides.length}`;
+      }
+
+      next() { this.showSlide(this.currentSlide + 1); }
+      prev() { this.showSlide(this.currentSlide - 1); }
+    }
+
+    new SlidePresentation();
+  </script>
+</body>
+</html>
